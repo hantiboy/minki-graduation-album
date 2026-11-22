@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>민기 졸업사진 앨범</title>
+<style>
+  :root{
+    --bg:#faf7f2;
+    --ink:#2b2420;
+    --sub:#8a7d6f;
+    --accent:#b8894a;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans KR","Malgun Gothic",-apple-system,sans-serif;
+  }
+  header{
+    text-align:center;
+    padding:56px 20px 32px;
+  }
+  header .eyebrow{
+    letter-spacing:.3em;
+    font-size:12px;
+    color:var(--accent);
+    font-weight:700;
+    text-transform:uppercase;
+  }
+  header h1{
+    margin:10px 0 6px;
+    font-size:clamp(28px,5vw,44px);
+    font-weight:700;
+  }
+  header p{
+    margin:0;
+    color:var(--sub);
+    font-size:14px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:18px;
+    max-width:1280px;
+    margin:0 auto;
+    padding:0 24px 72px;
+  }
+  figure{
+    margin:0;
+    background:var(--card);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(40,30,15,.08);
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  figure:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 22px rgba(40,30,15,.16);
+  }
+  figure img{
+    display:block;
+    width:100%;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    background:#eee;
+  }
+  figcaption{
+    padding:8px 10px;
+    font-size:12px;
+    color:var(--sub);
+    text-align:center;
+  }
+  footer{
+    text-align:center;
+    color:var(--sub);
+    font-size:12px;
+    padding:0 20px 56px;
+  }
+
+  .lightbox{
+    position:fixed; inset:0;
+    background:rgba(20,16,12,.92);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:40px;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox img{
+    max-width:min(92vw,1100px);
+    max-height:86vh;
+    object-fit:contain;
+    border-radius:6px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  .lightbox .nav{
+    position:absolute;
+    top:50%; transform:translateY(-50%);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    border:none;
+    width:48px; height:48px;
+    border-radius:50%;
+    font-size:22px;
+    cursor:pointer;
+  }
+  .lightbox .nav:hover{ background:rgba(255,255,255,.25); }
+  .lightbox .prev{ left:16px; }
+  .lightbox .next{ right:16px; }
+  .lightbox .close{
+    position:absolute;
+    top:18px; right:20px;
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:30px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .lightbox .count{
+    position:absolute;
+    bottom:18px;
+    left:50%; transform:translateX(-50%);
+    color:#cfc3b4;
+    font-size:13px;
+    letter-spacing:.05em;
+  }
+
+  @media print{
+    .lightbox{ display:none !important; }
+    figure{ box-shadow:none; break-inside:avoid; }
+    body{ background:#fff; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Graduation 2026</div>
+  <h1>민기 졸업사진 앨범</h1>
+  <p id="subtitle"></p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<footer>사진을 클릭하면 크게 볼 수 있어요</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="close" id="closeBtn">&times;</button>
+  <button class="nav prev" id="prevBtn">&#8249;</button>
+  <img id="lightboxImg" src="" alt="">
+  <button class="nav next" id="nextBtn">&#8250;</button>
+  <div class="count" id="count"></div>
+</div>
+
+<script>
+  const files = [
+    "보정완료/IMG_9424.JPG","보정완료/IMG_9426.JPG","보정완료/IMG_9436.JPG","보정완료/IMG_9439.JPG","보정완료/IMG_9450.JPG",
+    "보정완료/IMG_9453.JPG","보정완료/IMG_9461.JPG","보정완료/IMG_9465.JPG","보정완료/IMG_9473.JPG","보정완료/IMG_9475.JPG",
+    "보정완료/IMG_9481.JPG","보정완료/IMG_9487.JPG","보정완료/IMG_9489.JPG","보정완료/IMG_9494.JPG","보정완료/IMG_9499.JPG",
+    "보정완료/IMG_9512.JPG","보정완료/IMG_9524.JPG","보정완료/IMG_9532.JPG","보정완료/IMG_9543.JPG","보정완료/IMG_9558.JPG",
+    "보정완료/IMG_9563.JPG","보정완료/IMG_9567.JPG"
+  ];
+
+  document.getElementById('subtitle').textContent = files.length + '장의 사진';
+
+  const grid = document.getElementById('grid');
+  files.forEach((name, i) => {
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<img src="${name}" loading="lazy" alt="졸업사진 ${i+1}"><figcaption>${String(i+1).padStart(2,'0')}</figcaption>`;
+    fig.addEventListener('click', () => openLightbox(i));
+    grid.appendChild(fig);
+  });
+
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const countEl = document.getElementById('count');
+  let current = 0;
+
+  function openLightbox(i){
+    current = i;
+    render();
+    lightbox.classList.add('open');
+  }
+  function render(){
+    lightboxImg.src = files[current];
+    countEl.textContent = (current+1) + ' / ' + files.length;
+  }
+  function closeLightbox(){ lightbox.classList.remove('open'); }
+  function step(d){ current = (current + d + files.length) % files.length; render(); }
+
+  document.getElementById('closeBtn').addEventListener('click', closeLightbox);
+  document.getElementById('prevBtn').addEventListener('click', () => step(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => step(1));
+  lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e) => {
+    if(!lightbox.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowLeft') step(-1);
+    if(e.key === 'ArrowRight') step(1);
+  });
+</script>
+
+</body>
+</html>
