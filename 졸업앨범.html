@@ -20,25 +20,78 @@
     font-family:"Noto Sans KR","Malgun Gothic",-apple-system,sans-serif;
   }
   header{
+    position:relative;
     text-align:center;
-    padding:56px 20px 32px;
+    padding:72px 20px 40px;
+    overflow:hidden;
+  }
+  .confetti{
+    position:absolute;
+    top:-20px;
+    width:10px;
+    height:16px;
+    opacity:.85;
+    border-radius:2px;
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    0%{ transform:translateY(0) rotate(0deg); opacity:.9; }
+    85%{ opacity:.85; }
+    100%{ transform:translateY(420px) rotate(360deg); opacity:0; }
+  }
+  @keyframes fadeInDown{
+    from{ opacity:0; transform:translateY(-14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeInUp{
+    from{ opacity:0; transform:translateY(16px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes growLine{
+    from{ width:0; }
+    to{ width:64px; }
+  }
+  @keyframes sparkle{
+    0%,100%{ opacity:.3; transform:scale(.85) rotate(0deg); }
+    50%{ opacity:1; transform:scale(1.15) rotate(20deg); }
   }
   header .eyebrow{
+    display:inline-block;
     letter-spacing:.3em;
     font-size:12px;
     color:var(--accent);
     font-weight:700;
     text-transform:uppercase;
+    opacity:0;
+    animation:fadeInDown .7s ease .1s forwards;
+  }
+  header .cap{
+    display:inline-block;
+    margin-left:6px;
+    opacity:0;
+    animation:fadeInDown .7s ease .1s forwards, sparkle 2.4s ease-in-out 1.2s infinite;
   }
   header h1{
-    margin:10px 0 6px;
+    margin:14px 0 6px;
     font-size:clamp(28px,5vw,44px);
     font-weight:700;
+    opacity:0;
+    animation:fadeInUp .8s ease .35s forwards;
+  }
+  header .underline{
+    width:0;
+    height:3px;
+    margin:10px auto 14px;
+    background:linear-gradient(90deg,var(--accent),#d9b16c);
+    border-radius:3px;
+    animation:growLine .9s ease .75s forwards;
   }
   header p{
     margin:0;
     color:var(--sub);
     font-size:14px;
+    opacity:0;
+    animation:fadeInUp .8s ease .95s forwards;
   }
   .grid{
     display:grid;
@@ -133,6 +186,7 @@
 
   @media print{
     .lightbox{ display:none !important; }
+    .confetti{ display:none !important; }
     figure{ box-shadow:none; break-inside:avoid; }
     body{ background:#fff; }
   }
@@ -140,9 +194,10 @@
 </head>
 <body>
 
-<header>
-  <div class="eyebrow">Graduation 2026</div>
+<header id="header">
+  <div class="eyebrow">Graduation 2025<span class="cap">&#127891;</span></div>
   <h1>민기 졸업사진 앨범</h1>
+  <div class="underline"></div>
   <p id="subtitle"></p>
 </header>
 
@@ -159,6 +214,23 @@
 </div>
 
 <script>
+  (function spawnConfetti(){
+    const colors = ['#b8894a','#d9b16c','#8fb39a','#c97b7b','#7ea0c4'];
+    const header = document.getElementById('header');
+    const count = 26;
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.left = (Math.random()*100) + '%';
+      el.style.background = colors[i % colors.length];
+      el.style.width = (6 + Math.random()*6) + 'px';
+      el.style.height = (10 + Math.random()*8) + 'px';
+      el.style.animationDuration = (3.5 + Math.random()*3) + 's';
+      el.style.animationDelay = (Math.random()*4) + 's';
+      header.appendChild(el);
+    }
+  })();
+
   const files = [
     "보정완료/IMG_9424.JPG","보정완료/IMG_9426.JPG","보정완료/IMG_9436.JPG","보정완료/IMG_9439.JPG","보정완료/IMG_9450.JPG",
     "보정완료/IMG_9453.JPG","보정완료/IMG_9461.JPG","보정완료/IMG_9465.JPG","보정완료/IMG_9473.JPG","보정완료/IMG_9475.JPG",
